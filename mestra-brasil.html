@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Mestra Brasil Educação — o projeto História da Gente transforma a memória, a cultura e a identidade de cada município em material didático.">
+<meta name="theme-color" content="#212F36">
+<title>Mestra Brasil Educação — História da Gente</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" as="image" href="assets/logo-mestra-brasil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Permanent+Marker&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="module" src="mestra-brasil.js"></script>
+<style>
+:root{
+  --sky-1:#F4A85C; --sky-2:#C06B6E; --sky-3:#4B3B52;
+  --ink:#1E2A2E; --cream:#F4ECDD; --paper:#FBF6EC;
+  --terracotta:#C15A32; --terracotta-dark:#9B4526; --clay:#E58B63; --rose:#D98F86;
+  --sage:#5D8073; --sage-dark:#33473F; --navy:#212F36; --navy-2:#161E23; --gold:#E7B155;
+  --mtn-far:#66798A; --mtn-near:#324450; --line: rgba(30,42,46,0.12);
+  --ease: cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:auto;}
+body{
+  font-family:'Inter',sans-serif; background:var(--paper); color:var(--ink);
+  overflow-x:hidden; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif; letter-spacing:-0.01em;}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;display:block;}
+.container{max-width:1180px;margin:0 auto;padding:0 32px;}
+section{position:relative;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001s !important; animation-delay:0s !important; transition-duration:0.001s !important;}
+}
+
+/* ---------- CUSTOM CURSOR ---------- */
+#cursor-dot,#cursor-ring{position:fixed; top:0; left:0; pointer-events:none; z-index:9999; border-radius:50%; opacity:0;}
+#cursor-dot{width:8px;height:8px;background:#fff;mix-blend-mode:difference;}
+#cursor-ring{width:38px;height:38px;border:1.4px solid #fff;mix-blend-mode:difference;
+  transition:width .3s var(--ease), height .3s var(--ease);}
+#cursor-ring.hover{width:74px;height:74px;}
+body.has-custom-cursor{cursor:none;}
+body.has-custom-cursor a, body.has-custom-cursor button{cursor:none;}
+
+/* ---------- NAV ---------- */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; justify-content:space-between; padding:22px 40px;
+  opacity:0; animation:navIn 1.2s var(--ease) forwards; animation-delay:3.5s;
+  transition:background .5s var(--ease), padding .4s var(--ease), box-shadow .4s var(--ease);
+}
+.nav.solid{background:rgba(251,246,236,0.94); backdrop-filter:blur(10px); padding:14px 40px; box-shadow:0 1px 0 var(--line);}
+@keyframes navIn{from{opacity:0; transform:translateY(-8px);}to{opacity:1; transform:translateY(0);}}
+.nav-mark{display:flex;align-items:center;gap:10px;}
+.nav-mark img{height:26px; width:auto;}
+.nav-mark .logo-dark{display:none;}
+.nav.solid .nav-mark .logo-light{display:none;}
+.nav.solid .nav-mark .logo-dark{display:block;}
+.nav-links{display:flex;gap:34px;}
+.nav-links a{font-size:14px; font-weight:500; color:#fff; position:relative; padding-bottom:4px; transition:opacity .3s ease;}
+.nav.solid .nav-links a{color:var(--ink);}
+.nav-links a:hover{opacity:0.65;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--gold);transition:width .3s var(--ease);}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{border:1.5px solid rgba(255,255,255,0.7); padding:9px 20px; border-radius:100px; font-size:13px; font-weight:600;
+  display:inline-block; transition:background .3s ease, border-color .3s ease, color .3s ease;}
+.nav.solid .nav-cta{border-color:var(--ink);}
+.nav-cta:hover{background:var(--gold); border-color:var(--gold); color:var(--navy-2);}
+.nav-burger{display:none;}
+
+/* ---------- HERO ---------- */
+.hero{height:100vh; min-height:660px; position:relative; overflow:hidden;
+  background:linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 52%, var(--sky-3) 100%);}
+.hero-sun{position:absolute; left:50%; top:30%; width:420px; height:420px; margin:-210px 0 0 -210px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,236,200,0.55) 0%, rgba(255,236,200,0) 70%);
+  opacity:0; animation:sunIn 2.4s var(--ease) forwards, sunPulse 7s ease-in-out infinite 2.4s;}
+@keyframes sunIn{to{opacity:1;}}
+@keyframes sunPulse{0%,100%{transform:scale(1); opacity:0.9;}50%{transform:scale(1.08); opacity:1;}}
+.hero-clouds{position:absolute; inset:0; overflow:hidden;}
+.cloud{position:absolute; border-radius:100px; background:rgba(255,255,255,0.16); filter:blur(2px);
+  animation:driftRight 60s linear infinite, cloudIn 2s ease forwards;}
+.cloud.c1{width:220px;height:44px; top:16%; left:-10%; animation-duration:60s,2s; animation-delay:0s,.3s;}
+.cloud.c2{width:160px;height:34px; top:26%; left:60%; animation-duration:46s,2s; animation-direction:reverse,normal; animation-delay:0s,.5s;}
+.cloud.c3{width:120px;height:26px; top:10%; left:30%; animation-duration:70s,2s; animation-delay:0s,.7s;}
+@keyframes cloudIn{from{opacity:0;}to{opacity:1;}}
+@keyframes driftRight{from{transform:translateX(0);}to{transform:translateX(120vw);}}
+.mtn{position:absolute; bottom:0; left:0; width:100%; opacity:0; transform:translateY(24px); animation:mtnRise 1.6s var(--ease) forwards;}
+.mtn-far{height:42%; background:var(--mtn-far);
+  clip-path:polygon(0% 100%,0% 55%,8% 40%,18% 58%,29% 30%,41% 52%,53% 22%,64% 46%,76% 18%,88% 44%,100% 30%,100% 100%);
+  animation-delay:.1s; opacity:.7;}
+.mtn-near{height:30%; background:var(--mtn-near);
+  clip-path:polygon(0% 100%,0% 62%,12% 42%,24% 60%,34% 38%,46% 58%,60% 34%,72% 56%,86% 40%,100% 58%,100% 100%);
+  animation-delay:.26s;}
+@keyframes mtnRise{to{opacity:1; transform:translateY(0);}}
+.wires{position:absolute; left:0; right:0; bottom:27%; height:32%; z-index:5; opacity:0;
+  animation:fadeIn 1.2s ease forwards; animation-delay:2.3s; pointer-events:none;}
+@keyframes fadeIn{to{opacity:1;}}
+.skyline{position:absolute; bottom:0; left:0; width:100%; height:44%; display:flex; align-items:flex-end;
+  justify-content:center; z-index:4; padding:0 2%; gap:3px;}
+.building{position:relative; flex-shrink:0; border-radius:3px 3px 0 0; transform:translateY(120%); opacity:0;
+  animation:riseUp .9s var(--ease) forwards; box-shadow:inset 0 0 0 1px rgba(0,0,0,0.05);}
+.building .roof{position:absolute; left:50%; bottom:100%; transform:translateX(-50%); width:0; height:0;
+  border-left:transparent solid; border-right:transparent solid; border-bottom-style:solid;}
+.building .win{position:absolute; inset:9px 9px 4px 9px;
+  background-image:linear-gradient(rgba(255,255,255,.32) 1px, transparent 1px);
+  background-size:100% 15px; opacity:.5; border-radius:2px 2px 0 0;}
+@keyframes riseUp{0%{transform:translateY(120%); opacity:0;}55%{opacity:1;}100%{transform:translateY(0); opacity:1;}}
+.hero-overlay{position:absolute; inset:0; z-index:10; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:0 24px;}
+.hero-logo-card{opacity:0; transform:translateY(18px) scale(.96); animation:logoFade 1.3s var(--ease) forwards; animation-delay:2.25s;
+  background:rgba(255,255,255,0.94); backdrop-filter:blur(6px); border-radius:22px; padding:38px 54px 30px;
+  box-shadow:0 30px 60px -20px rgba(20,15,10,0.4); display:flex; flex-direction:column; align-items:center;}
+.hero-logo-card img.brand{height:58px; width:auto; margin-bottom:18px;}
+.hero-logo-card img.product{height:70px; width:auto;}
+@keyframes logoFade{to{opacity:1; transform:translateY(0) scale(1);}}
+.hero-desc{opacity:0; transform:translateY(14px); animation:fadeUp 1s var(--ease) forwards; animation-delay:3.15s;
+  max-width:540px; margin-top:26px; color:rgba(255,255,255,0.94); font-size:16px; line-height:1.65; font-weight:400;
+  text-shadow:0 2px 12px rgba(0,0,0,0.2);}
+.hero-tag{opacity:0; transform:translateY(14px); animation:fadeUp 1s var(--ease) forwards; animation-delay:3.45s;
+  margin-top:24px; display:inline-flex; gap:10px; align-items:center; font-size:12px; letter-spacing:0.2em;
+  text-transform:uppercase; color:rgba(255,255,255,0.78);}
+.hero-tag span{width:34px; height:1px; background:rgba(255,255,255,0.5);}
+@keyframes fadeUp{to{opacity:1; transform:translateY(0);}}
+.scroll-cue{position:absolute; bottom:32px; left:50%; transform:translateX(-50%); z-index:10; opacity:0;
+  animation:fadeIn 1.2s ease forwards; animation-delay:3.9s; display:flex; flex-direction:column; align-items:center; gap:8px;}
+.scroll-cue .dot-line{width:1px; height:36px; background:rgba(255,255,255,0.5); position:relative; overflow:hidden;}
+.scroll-cue .dot-line::after{content:''; position:absolute; top:-100%; left:0; width:100%; height:100%; background:#fff;
+  animation:dotSlide 2.2s ease-in-out infinite; animation-delay:4.2s;}
+@keyframes dotSlide{0%{top:-100%;}55%{top:100%;}100%{top:100%;}}
+.scroll-cue span{font-size:10px; letter-spacing:0.2em; color:rgba(255,255,255,0.6); text-transform:uppercase;}
+
+/* ---------- WORD-MASK TITLE REVEAL ---------- */
+.word-mask{display:inline-block; overflow:hidden; vertical-align:top;}
+.word-inner{display:inline-block; transform:translateY(112%); will-change:transform;}
+
+/* ---------- REVEAL (simple fade) ---------- */
+.reveal{opacity:0; transform:translateY(24px); transition:opacity 1s var(--ease), transform 1s var(--ease);}
+.reveal.in-view{opacity:1; transform:translateY(0);}
+.reveal.d1{transition-delay:.1s;} .reveal.d2{transition-delay:.2s;} .reveal.d3{transition-delay:.3s;}
+.reveal.d4{transition-delay:.4s;} .reveal.d5{transition-delay:.5s;} .reveal.d6{transition-delay:.6s;}
+
+/* ---------- SHARED ---------- */
+.eyebrow{font-size:12px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--terracotta);
+  margin-bottom:16px; display:flex; align-items:center; gap:10px;}
+.eyebrow::before{content:'';width:22px;height:2px;background:var(--terracotta);display:inline-block;}
+.eyebrow.on-dark{color:var(--gold);} .eyebrow.on-dark::before{background:var(--gold);}
+h2.section-title{font-size:clamp(30px,4.2vw,48px); font-weight:700; line-height:1.08; margin-bottom:22px;}
+.section-lead{font-size:17px; line-height:1.75; color:#4a4038; max-width:620px;}
+.on-dark .section-lead{color:rgba(255,255,255,0.78);}
+
+/* ---------- STATEMENT (scroll-scrub text) ---------- */
+.statement{background:var(--paper); padding:150px 0;}
+.statement-text{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:clamp(28px,4.6vw,54px);
+  line-height:1.28; max-width:1000px;}
+.sw{opacity:.18; transition:opacity .2s linear;}
+.statement-text em{font-style:normal; color:var(--terracotta);}
+
+/* ---------- SOBRE ---------- */
+.sobre{background:var(--paper); padding:60px 0 110px;}
+.sobre-grid{display:grid; grid-template-columns:1fr 1fr; gap:70px; align-items:start;}
+.sobre-block + .sobre-block{margin-top:52px;}
+.sobre-block h3{font-size:22px; margin-bottom:14px; font-weight:700;}
+.sobre-block p{font-size:15.5px; line-height:1.75; color:#4a4038;}
+.sobre-art{position:relative; border-radius:26px; overflow:hidden; height:520px;
+  background:linear-gradient(160deg, var(--rose) 0%, var(--terracotta) 55%, var(--terracotta-dark) 100%);
+  clip-path:inset(100% 0 0 0 round 26px);}
+.sobre-art .mini-mtn{position:absolute; bottom:0; left:0; width:100%; height:38%; background:var(--sage-dark); opacity:.55;
+  clip-path:polygon(0 100%,0 40%,20% 65%,38% 20%,55% 55%,72% 15%,88% 50%,100% 30%,100% 100%);}
+.sobre-art .mini-skyline{position:absolute; bottom:0; left:0; width:100%; height:46%; display:flex; align-items:flex-end; padding:0 6%; gap:3px;}
+.sobre-art .mb{flex:1; background:var(--cream); opacity:.9; border-radius:2px 2px 0 0;}
+.sobre-quote{position:absolute; top:34px; left:34px; right:34px; font-family:'Space Grotesk',sans-serif; font-weight:600;
+  color:#fff; font-size:22px; line-height:1.4; text-shadow:0 2px 10px rgba(0,0,0,0.2);}
+
+/* ---------- PROPOSTA ---------- */
+.proposta{background:var(--navy); color:#fff; padding:120px 0;}
+.proposta-grid{display:grid; grid-template-columns:0.9fr 1.1fr; gap:70px; align-items:center;}
+.proposta-card{background:var(--navy-2); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:34px;}
+.proposta-card ul{list-style:none; display:flex; flex-direction:column; gap:20px;}
+.proposta-card li{display:flex; gap:14px; font-size:15px; line-height:1.6; color:rgba(255,255,255,0.85);}
+.proposta-card li b{color:#fff; display:block; font-weight:600; margin-bottom:2px;}
+.check{flex-shrink:0; width:22px; height:22px; border-radius:50%; background:var(--gold); display:flex;
+  align-items:center; justify-content:center; margin-top:2px;}
+.check svg{width:12px; height:12px;}
+
+/* ---------- OBJETIVOS ---------- */
+.objetivos{background:var(--terracotta); color:#fff; padding:120px 0;}
+.objetivos .eyebrow{color:#fff;} .objetivos .eyebrow::before{background:#fff;} .objetivos h2{color:#fff;}
+.obj-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:26px; margin-top:56px;}
+.obj-card{background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:18px; padding:30px 26px;
+  min-height:210px; display:flex; flex-direction:column; justify-content:space-between;
+  transition:background .4s var(--ease), transform .4s var(--ease);}
+.obj-card:hover{background:rgba(255,255,255,0.15); transform:translateY(-4px);}
+.obj-num{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; opacity:.7; letter-spacing:0.1em;}
+.obj-card p{font-size:15px; line-height:1.55; margin-top:auto; padding-top:18px; font-weight:500;}
+
+/* ---------- DIFERENCIAIS ---------- */
+.dif{background:var(--paper); padding:120px 0 100px;}
+.dif-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);
+  border:1px solid var(--line); border-radius:20px; overflow:hidden; margin-top:56px;}
+.dif-item{background:var(--paper); padding:36px 30px; transition:background .35s ease;}
+.dif-item:hover{background:#fff;}
+.dif-icon{width:38px; height:38px; margin-bottom:20px; color:var(--sage);}
+.dif-item h4{font-size:16.5px; font-weight:700; margin-bottom:10px;}
+.dif-item p{font-size:14.5px; line-height:1.6; color:#5a5148;}
+
+/* ---------- MARQUEE ---------- */
+.marquee{overflow:hidden; white-space:nowrap; background:var(--terracotta); padding:24px 0;}
+.marquee-track{display:inline-flex; animation:marqueeScroll 26s linear infinite;}
+.marquee-track span{display:inline-flex; align-items:center; font-family:'Space Grotesk',sans-serif; font-weight:700;
+  font-size:clamp(20px,3vw,32px); color:#fff; text-transform:uppercase; letter-spacing:0.01em; padding:0 26px;}
+.marquee-track span.outline{-webkit-text-stroke:1.4px rgba(255,255,255,0.85); color:transparent;}
+.marquee-track span.dot{padding:0 6px; opacity:.7;}
+@keyframes marqueeScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ---------- CONTEUDO ---------- */
+.conteudo{background:var(--sage-dark); color:#fff; padding:120px 0;}
+.conteudo .eyebrow{color:var(--gold);} .conteudo .eyebrow::before{background:var(--gold);}
+.cont-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:56px;}
+.cont-card{background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:24px 20px;
+  font-size:14.5px; font-weight:600; display:flex; align-items:center; gap:12px;
+  transition:background .3s ease, border-color .3s ease;}
+.cont-card:hover{background:rgba(255,255,255,0.12); border-color:var(--gold);}
+.cont-dot{width:8px; height:8px; border-radius:50%; background:var(--gold); flex-shrink:0;}
+
+/* ---------- SUMARIO ---------- */
+.sumario{background:var(--paper); padding:120px 0;}
+.sum-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:24px; margin-top:56px;}
+.sum-card{border-top:3px solid var(--terracotta); padding-top:20px;}
+.sum-card:nth-child(2){border-color:var(--sage);} .sum-card:nth-child(3){border-color:var(--gold);}
+.sum-card:nth-child(4){border-color:var(--rose);} .sum-card:nth-child(5){border-color:var(--navy);}
+.sum-card h4{font-size:16px; font-weight:700; margin-bottom:14px; line-height:1.3;}
+.sum-card ul{list-style:none; display:flex; flex-direction:column; gap:8px;}
+.sum-card li{font-size:13.5px; color:#5a5148; line-height:1.5; padding-left:14px; position:relative;}
+.sum-card li::before{content:'—'; position:absolute; left:0; color:#b8ab98;}
+
+/* ---------- LEGAL ---------- */
+.legal{background:var(--navy); color:#fff; padding:90px 0;}
+.legal-inner{display:grid; grid-template-columns:0.5fr 1.5fr; gap:60px; align-items:center;}
+.legal h3{font-size:20px; font-weight:700; margin-bottom:8px;}
+.legal .law-tag{font-size:13px; color:var(--gold); font-weight:600; letter-spacing:.04em;}
+.legal blockquote{font-size:18px; line-height:1.7; color:rgba(255,255,255,0.88); font-style:normal;
+  border-left:2px solid var(--gold); padding-left:26px;}
+
+/* ---------- CIDADES ---------- */
+.cidades{background:var(--paper); padding:130px 0;}
+.city-scroll{display:flex; gap:24px; overflow-x:auto; padding:56px 4px 16px; scroll-snap-type:x mandatory;
+  -ms-overflow-style:none; scrollbar-width:none;}
+.city-scroll::-webkit-scrollbar{display:none;}
+.city-card{flex:0 0 240px; scroll-snap-align:start; border-radius:20px; overflow:hidden; height:340px; position:relative;
+  display:flex; flex-direction:column; justify-content:flex-end; box-shadow:0 18px 40px -18px rgba(30,42,46,0.35);
+  transition:transform .5s var(--ease); clip-path:inset(100% 0 0 0 round 20px);}
+.city-card:hover{transform:translateY(-8px);}
+.city-card .city-sky{position:absolute; inset:0;}
+.city-card .city-mtn{position:absolute; bottom:0; left:0; width:100%; height:34%; opacity:.55;
+  clip-path:polygon(0 100%,0 45%,22% 68%,40% 25%,58% 60%,76% 18%,100% 48%,100% 100%);}
+.city-card .city-blocks{position:absolute; bottom:0; left:0; width:100%; height:44%; display:flex; align-items:flex-end; padding:0 8%;}
+.city-card .cb{flex:1; margin:0 2.5px; border-radius:1px 1px 0 0;}
+.city-card .city-label{position:relative; z-index:3; padding:22px; color:#fff;}
+.city-card .city-label .cname{font-weight:700; font-size:19px; display:block;}
+.city-card .city-label .cstate{font-size:12px; letter-spacing:0.14em; opacity:.8; text-transform:uppercase;}
+
+/* ---------- PARCEIROS ---------- */
+.parceiros{background:var(--paper); padding:80px 0 100px; border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+.parc-row{display:flex; flex-wrap:wrap; gap:16px; margin-top:36px;}
+.parc-chip{border:1px solid var(--line); border-radius:100px; padding:12px 24px; font-size:13.5px; font-weight:600;
+  color:#4a4038; display:flex; align-items:center; gap:10px; transition:border-color .3s ease, transform .3s ease;}
+.parc-chip:hover{border-color:var(--terracotta); transform:translateY(-2px);}
+.parc-chip .dot{width:7px; height:7px; border-radius:50%; background:var(--terracotta);}
+
+/* ---------- CONTATO ---------- */
+.contato{background:var(--navy-2); color:#fff; padding:120px 0 60px;}
+.contato-grid{display:grid; grid-template-columns:1.2fr 1fr; gap:60px; align-items:start;}
+.contato h2{font-size:clamp(30px,4.4vw,50px); font-weight:700; line-height:1.1; margin-bottom:24px;}
+.contato .section-lead{color:rgba(255,255,255,0.7); margin-bottom:36px;}
+.contato-btn{display:inline-flex; align-items:center; gap:12px; background:var(--gold); color:var(--navy-2);
+  padding:16px 30px; border-radius:100px; font-weight:700; font-size:15px;
+  transition:box-shadow .35s var(--ease);}
+.contato-btn:hover{box-shadow:0 14px 30px -10px rgba(231,177,85,0.5);}
+.contato-info{display:flex; flex-direction:column; gap:22px;}
+.contato-info .row{border-top:1px solid rgba(255,255,255,0.1); padding-top:16px;}
+.contato-info .lbl{font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:6px;}
+.contato-info .val{font-size:16px; font-weight:600;}
+.footer-bottom{margin-top:100px; padding-top:26px; border-top:1px solid rgba(255,255,255,0.1); display:flex;
+  justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; font-size:13px; color:rgba(255,255,255,0.5);}
+.footer-mark{display:flex; align-items:center; gap:10px;}
+.footer-mark img{height:20px; width:auto;}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:960px){
+  .sobre-grid, .proposta-grid, .legal-inner, .contato-grid{grid-template-columns:1fr; gap:40px;}
+  .obj-grid{grid-template-columns:repeat(2,1fr);} .dif-grid{grid-template-columns:repeat(2,1fr);}
+  .cont-grid{grid-template-columns:repeat(2,1fr);} .sum-grid{grid-template-columns:repeat(2,1fr);}
+  .sobre-art{height:360px;}
+}
+@media (max-width:680px){
+  .nav-links{display:none;}
+  .nav-burger{display:block; color:#fff; font-size:22px;}
+  .nav.solid .nav-burger{color:var(--ink);}
+  .container{padding:0 22px;}
+  .obj-grid, .dif-grid, .cont-grid, .sum-grid{grid-template-columns:1fr;}
+  .hero-logo-card{padding:26px 26px 22px;}
+  .hero-logo-card img.brand{height:38px;} .hero-logo-card img.product{height:46px;}
+  #cursor-dot,#cursor-ring{display:none;}
+}
+</style>
+<link rel="stylesheet" href="mestra-brasil.css">
+</head>
+<body>
+
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- ================= NAV ================= -->
+<header class="nav" id="mainNav">
+  <a href="#hero" class="nav-mark">
+    <img class="logo-light" src="assets/logo-mestra-brasil.png" alt="Mestra Brasil Educação">
+    <img class="logo-dark" src="assets/logo-mestra-brasil.png" alt="Mestra Brasil Educação">
+  </a>
+  <nav class="nav-links" id="mainMenu" aria-label="Navegação principal">
+    <a href="#empresa">Empresa</a>
+    <a href="#proposta">Proposta</a>
+    <a href="#conteudo">Conteúdo</a>
+    <a href="#contato">Contato</a>
+  </nav>
+  <a href="https://api.whatsapp.com/send?phone=552169960596&amp;text=Ol%C3%A1%2C%20gostaria%20de%20conhecer%20melhor%20a%20Mestra%20Brasil%20Educa%C3%A7%C3%A3o." class="nav-cta" target="_blank" rel="noopener noreferrer">Fale conosco</a>
+  <button class="nav-burger" type="button" aria-label="Abrir menu" aria-controls="mainMenu" aria-expanded="false"><span></span><span></span></button>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="hero">
+  <div class="hero-sun"></div>
+  <div class="hero-clouds">
+    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  </div>
+  <div class="mtn mtn-far" id="mtnFar"></div>
+  <div class="mtn mtn-near" id="mtnNear"></div>
+  <svg class="wires" viewBox="0 0 1000 200" preserveAspectRatio="none">
+    <path d="M0,20 Q250,90 500,30 T1000,50" stroke="rgba(0,0,0,0.28)" stroke-width="1.4" fill="none"/>
+    <path d="M0,60 Q250,130 500,70 T1000,90" stroke="rgba(0,0,0,0.2)" stroke-width="1.2" fill="none"/>
+  </svg>
+  <div class="skyline" id="skyline"></div>
+  <div class="hero-overlay">
+    <div class="hero-logo-card">
+      <img class="brand" src="assets/logo-mestra-brasil.png" alt="Mestra Brasil Educação">
+      <div class="product-lockup" aria-label="Conhecer para pertencer — Conhecendo Nossa Cidade e Sociedade">
+        <strong>CONHECER PARA PERTENCER</strong>
+        <span>Conhecendo nossa cidade e sociedade</span>
+      </div>
+    </div>
+    <p class="hero-desc">Pesquisa documental e prática pedagógica reunidas em um projeto didático que revela a
+      história, a memória e a identidade de cada cidade brasileira para alunos do Ensino Fundamental.</p>
+    <div class="hero-tag"><span></span>Ensino Fundamental I e II<span></span></div>
+  </div>
+  <div class="scroll-cue"><div class="dot-line"></div><span>Role para conhecer</span></div>
+</section>
+
+<!-- ================= STATEMENT ================= -->
+<section class="statement" id="statement">
+  <div class="container">
+    <h2 class="statement-text" data-split-plain>Cada cidade guarda ruas, memórias e personagens que ainda não foram contados. Transformamos essa história em um livro que os alunos <em>reconhecem como seu</em>.</h2>
+  </div>
+</section>
+
+<!-- ================= SOBRE ================= -->
+<section class="sobre" id="sobre">
+  <div class="container sobre-grid">
+    <div>
+      <div class="eyebrow reveal">Quem somos</div>
+      <div class="sobre-block reveal d1">
+        <h3>A Mestra Brasil</h3>
+        <p>Somos uma empresa de educação dedicada a transformar conhecimento em pertencimento. Desenvolvemos projetos
+          editoriais e pedagógicos que aproximam escolas, redes públicas e comunidades das histórias que formam cada
+          território brasileiro.</p>
+      </div>
+      <div class="sobre-block reveal d2">
+        <h3>Conceito</h3>
+        <p>Compreender a história do próprio município é compreender a formação social do país e a diversidade
+          cultural das suas regiões. Por isso resgatamos memória, cultura e economia local para formar alunos
+          protagonistas e gestores comprometidos com a construção de um legado para a cidade.</p>
+      </div>
+    </div>
+    <div class="sobre-art" id="sobreArt">
+      <div class="art-grid" aria-hidden="true"></div>
+      <div class="art-sun" aria-hidden="true"></div>
+      <svg class="art-routes" viewBox="0 0 600 520" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M-30 240 C90 160 165 280 270 205 S455 120 640 225" />
+        <path d="M-20 310 C100 240 180 350 310 280 S490 225 630 310" />
+        <circle cx="270" cy="205" r="5" />
+        <circle cx="455" cy="155" r="5" />
+      </svg>
+      <div class="art-mtn art-mtn-far" aria-hidden="true"></div>
+      <div class="art-mtn art-mtn-near" aria-hidden="true"></div>
+      <div class="mini-skyline" id="miniSkyline"></div>
+      <div class="art-ground" aria-hidden="true"></div>
+      <div class="sobre-quote">
+        <span class="quote-mark">“</span>
+        <p>Juntos compartilhamos a riqueza de histórias que moldaram o nosso país.</p>
+        <small>Memória • território • educação</small>
+      </div>
+      <div class="art-label" aria-hidden="true"><span>Brasil</span><b>Histórias vivas</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EMPRESA ================= -->
+<section class="empresa" id="empresa">
+  <div class="container empresa-head">
+    <div>
+      <div class="eyebrow reveal">Mestra Brasil Educação</div>
+      <h2 class="section-title reveal d1">Conhecimento que nasce<br>do território</h2>
+    </div>
+    <p class="section-lead reveal d2">Mais do que uma editora, somos uma parceira educacional de municípios e escolas.
+      Unimos pesquisa, curadoria, produção editorial e prática pedagógica para criar soluções que valorizam a cultura
+      local e fortalecem a aprendizagem.</p>
+  </div>
+  <div class="container empresa-grid">
+    <article class="empresa-card reveal d1">
+      <span class="empresa-num">01</span>
+      <h3>Pesquisa e curadoria</h3>
+      <p>Investigamos documentos, memórias e fontes locais para construir conteúdos confiáveis, relevantes e próximos da comunidade.</p>
+    </article>
+    <article class="empresa-card reveal d2">
+      <span class="empresa-num">02</span>
+      <h3>Soluções educacionais</h3>
+      <p>Criamos projetos editoriais, materiais didáticos e experiências de aprendizagem alinhadas à realidade de cada rede de ensino.</p>
+    </article>
+    <article class="empresa-card reveal d3">
+      <span class="empresa-num">03</span>
+      <h3>Parceria com municípios</h3>
+      <p>Acompanhamos cada etapa, do planejamento à entrega, em colaboração com secretarias, educadores e agentes da cultura local.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ================= PROPOSTA ================= -->
+<section class="proposta" id="proposta">
+  <div class="container proposta-grid">
+    <div>
+      <div class="eyebrow on-dark reveal">Proposta didática</div>
+      <h2 class="section-title" data-split>Um livro construído<br>para a sua cidade</h2>
+      <p class="section-lead reveal d2">A proposta de adoção do livro é elaborada e personalizada para cada
+        município, abrangendo toda a grade curricular do Ensino Fundamental I, II e EJA — com entrega oficial
+        realizada junto à Secretaria de Educação Municipal.</p>
+    </div>
+    <div class="proposta-card reveal d3">
+      <ul>
+        <li><span class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4.5" stroke="var(--navy-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><b>Conteúdo personalizado</b>Narrativa exclusiva sobre fundação, geografia, cultura e economia de cada cidade.</div></li>
+        <li><span class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4.5" stroke="var(--navy-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><b>Grade curricular completa</b>Alinhado ao Ensino Fundamental I, II e Educação de Jovens e Adultos.</div></li>
+        <li><span class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4.5" stroke="var(--navy-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><b>Evento de entrega</b>Cerimônia junto à Secretaria de Educação Municipal na aquisição do projeto.</div></li>
+        <li><span class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4.5" stroke="var(--navy-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><b>Base legal</b>Fundamentado na LDB, respeitando a parte diversificada exigida por cada região.</div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OBJETIVOS ================= -->
+<section class="objetivos" id="objetivos">
+  <div class="container">
+    <div class="eyebrow reveal">Objetivos do projeto</div>
+    <h2 class="section-title" data-split>O que queremos<br>construir juntos</h2>
+    <div class="obj-grid">
+      <div class="obj-card reveal d1"><div class="obj-num">01</div><p>Conhecer a identidade sociocultural local, promovendo a valorização da cidadania.</p></div>
+      <div class="obj-card reveal d2"><div class="obj-num">02</div><p>Proporcionar compreensão profunda da trajetória da cidade, resgatando sua história e cultura.</p></div>
+      <div class="obj-card reveal d3"><div class="obj-num">03</div><p>Promover senso de identidade e pertencimento entre alunos e gestores da comunidade.</p></div>
+      <div class="obj-card reveal d4"><div class="obj-num">04</div><p>Revelar momentos, marcos e histórias que moldaram as comunidades ao longo do tempo.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DIFERENCIAIS ================= -->
+<section class="dif" id="diferenciais">
+  <div class="container">
+    <div class="eyebrow reveal">Diferenciais</div>
+    <h2 class="section-title" data-split>Por que o História<br>da Gente é diferente</h2>
+    <p class="section-lead reveal d2">Numa linguagem simples e envolvente, cada obra vai além dos conteúdos genéricos
+      dos livros didáticos tradicionais.</p>
+    <div class="dif-grid">
+      <div class="dif-item reveal d1"><svg class="dif-icon" viewBox="0 0 24 24" fill="none"><path d="M4 19V6a2 2 0 012-2h9l5 5v10a2 2 0 01-2 2H6a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.5"/><path d="M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <h4>Narrativa personalizada</h4><p>Uma história contada de forma envolvente e impactante, exclusiva para cada cidade.</p></div>
+      <div class="dif-item reveal d2"><svg class="dif-icon" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-5.2-7-11a7 7 0 0114 0c0 5.8-7 11-7 11z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.5"/></svg>
+        <h4>Informações regionais</h4><p>Conteúdo específico de cada região, muito além do genérico dos livros tradicionais.</p></div>
+      <div class="dif-item reveal d3"><svg class="dif-icon" viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <h4>Memória e diversidade</h4><p>Pesquisa e relatos sobre memória, evolução e diversidade cultural do município.</p></div>
+      <div class="dif-item reveal d4"><svg class="dif-icon" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.6 6.6L21 9l-5 4.4L17.4 21 12 17.3 6.6 21 8 13.4 3 9l6.4-.4L12 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <h4>Protagonismo do aluno</h4><p>Estímulo à participação ativa dos alunos ao longo de todo o processo de aprendizado.</p></div>
+      <div class="dif-item reveal d5"><svg class="dif-icon" viewBox="0 0 24 24" fill="none"><path d="M9 18l-5-5 5-5M15 6l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h4>Atividades interativas</h4><p>Desafios e exercícios que estimulam a curiosidade e a pesquisa ao longo do livro.</p></div>
+      <div class="dif-item reveal d6"><svg class="dif-icon" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l3 8 4-16 3 8h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h4>Teoria e prática</h4><p>Integração com visitas a locais históricos e atividades de campo relacionadas ao conteúdo.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MARQUEE ================= -->
+<div class="marquee">
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
+<!-- ================= CONTEUDO ================= -->
+<section class="conteudo" id="conteudo">
+  <div class="container">
+    <div class="eyebrow reveal">O que cada livro aborda</div>
+    <h2 class="section-title" data-split>Conteúdos</h2>
+    <p class="section-lead reveal d2">Uma jornada completa pela identidade do município, do passado às práticas do presente.</p>
+    <div class="cont-grid">
+      <div class="cont-card reveal d1"><span class="cont-dot"></span>Fundação e Origem</div>
+      <div class="cont-card reveal d1"><span class="cont-dot"></span>Geografia e Localização</div>
+      <div class="cont-card reveal d2"><span class="cont-dot"></span>Povos e Colonização</div>
+      <div class="cont-card reveal d2"><span class="cont-dot"></span>Desenvolvimento Econômico</div>
+      <div class="cont-card reveal d3"><span class="cont-dot"></span>Personalidades Locais</div>
+      <div class="cont-card reveal d3"><span class="cont-dot"></span>Política e Cidadania</div>
+      <div class="cont-card reveal d4"><span class="cont-dot"></span>Patrimônio Cultural</div>
+      <div class="cont-card reveal d4"><span class="cont-dot"></span>Transformações Urbanas</div>
+      <div class="cont-card reveal d5"><span class="cont-dot"></span>História e Lendas Locais</div>
+      <div class="cont-card reveal d5"><span class="cont-dot"></span>Meio Ambiente</div>
+      <div class="cont-card reveal d6"><span class="cont-dot"></span>Curiosidades e Fatos</div>
+      <div class="cont-card reveal d6"><span class="cont-dot"></span>Atividades Práticas</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SUMARIO EDITORIAL ================= -->
+<section class="sumario" id="sumario">
+  <div class="container">
+    <div class="eyebrow reveal">Estrutura do livro</div>
+    <h2 class="section-title" data-split>Sumário editorial</h2>
+    <p class="section-lead reveal d2">Cinco editorias guiam os exercícios de interpretação e as práticas conduzidas com a participação ativa dos professores.</p>
+    <div class="sum-grid">
+      <div class="sum-card reveal d1"><h4>História e Memória</h4><ul><li>Passado e Presente</li><li>Histórias que Moldaram Nossa Cidade</li><li>Nossa Sociedade</li></ul></div>
+      <div class="sum-card reveal d2"><h4>Cidade e Sociedade</h4><ul><li>O Convívio e as Relações Humanas</li><li>Patrimônio e Formação Cultural</li><li>Nossas Expressões, Aspectos e Valores</li></ul></div>
+      <div class="sum-card reveal d3"><h4>Meio Ambiente</h4><ul><li>Vivendo em Harmonia</li><li>Nossa Responsabilidade com a Natureza</li></ul></div>
+      <div class="sum-card reveal d4"><h4>Política e Cidadania</h4><ul><li>Nossos Direitos, Deveres e Participação</li></ul></div>
+      <div class="sum-card reveal d5"><h4>Lazer e Turismo</h4><ul><li>Descobrindo Nossa Cidade</li><li>Passeios e Aventuras</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LEGAL ================= -->
+<section class="legal" id="legal">
+  <div class="container legal-inner">
+    <div class="reveal">
+      <div class="law-tag">Lei nº 9.394/1996</div>
+      <h3>Embasamento legal</h3>
+      <p style="color:rgba(255,255,255,0.6); font-size:14px; margin-top:8px;">Lei de Diretrizes e Bases da Educação</p>
+    </div>
+    <blockquote class="reveal d2">"Os currículos do ensino fundamental e médio devem ter uma base nacional comum,
+      a ser complementada, em cada sistema de ensino e estabelecimento escolar, por uma parte diversificada,
+      exigida pelas características regionais e locais da sociedade, da cultura, da economia e da clientela."
+      <div style="margin-top:14px; font-size:13px; color:rgba(255,255,255,0.5);">— Art. 26</div>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ================= CIDADES ================= -->
+<section class="cidades" id="cidades" hidden aria-hidden="true">
+  <div class="container">
+    <div class="eyebrow reveal">Já em construção</div>
+    <h2 class="section-title" data-split>Cada cidade,<br>uma capa única</h2>
+    <p class="section-lead reveal d2">A identidade visual de cada livro nasce das cores, do relevo e do caráter da própria cidade.</p>
+  </div>
+  <div class="container" style="max-width:1180px;">
+    <div class="city-scroll" id="cityScroll"></div>
+  </div>
+</section>
+
+<!-- ================= PARCEIROS ================= -->
+<section class="parceiros" id="parceiros">
+  <div class="container">
+    <div class="eyebrow reveal">Credibilidade</div>
+    <h2 class="section-title reveal d1" style="font-size:26px;">Nossos parceiros e certificações</h2>
+    <div class="parc-row reveal d2">
+      <div class="parc-chip"><span class="dot"></span>Objetivos de Desenvolvimento Sustentável — ONU</div>
+      <div class="parc-chip"><span class="dot"></span>ISBN</div>
+      <div class="parc-chip"><span class="dot"></span>Câmara Brasileira do Livro</div>
+      <div class="parc-chip"><span class="dot"></span>Biblioteca Nacional</div>
+      <div class="parc-chip"><span class="dot"></span>FSC — Manejo Florestal Responsável</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTATO ================= -->
+<footer class="contato" id="contato">
+  <div class="container contato-grid">
+    <div class="reveal">
+      <div class="eyebrow on-dark">Vamos construir juntos</div>
+      <h2>Leve a história<br>da sua cidade<br>para a sala de aula</h2>
+      <p class="section-lead">Entre em contato e descubra como personalizar o projeto História da Gente para o seu município.</p>
+      <a href="https://api.whatsapp.com/send?phone=552169960596&amp;text=Ol%C3%A1%2C%20gostaria%20de%20conversar%20com%20a%20equipe%20da%20Mestra%20Brasil%20Educa%C3%A7%C3%A3o." class="contato-btn" target="_blank" rel="noopener noreferrer">Falar com a equipe →</a>
+    </div>
+    <div class="contato-info reveal d2">
+      <div class="row"><div class="lbl">E-mail</div><div class="val">mestrabrasileducacao@gmail.com</div></div>
+      <div class="row"><div class="lbl">Telefone</div><div class="val"><a href="https://api.whatsapp.com/send?phone=552169960596" target="_blank" rel="noopener noreferrer">(21) 6996-0596</a></div></div>
+      <div class="row"><div class="lbl">Site</div><div class="val">www.mestrabrasil.com.br</div></div>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <div class="footer-mark"><img src="assets/logo-mestra-brasil.png" alt="Mestra Brasil Educação"> Mestra Brasil Educação</div>
+    <div>© <span data-current-year>2026</span> Editora Mestra Brasil Educação. Todos os direitos reservados.</div>
+  </div>
+</footer>
+
+<script>
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hasFinePointer = window.matchMedia('(pointer:fine)').matches;
+
+// ---------- BUILD HERO SKYLINE ----------
+const palette = ['#C15A32','#E58B63','#5D8073','#D98F86','#E7B155','#33473F','#9B4526','#F4ECDD'];
+const heroData = [
+  {w:50,h:110,roof:0},{w:38,h:160,roof:1},{w:62,h:90,roof:0},{w:44,h:190,roof:0},
+  {w:54,h:130,roof:1},{w:68,h:220,roof:0},{w:40,h:105,roof:1},{w:58,h:170,roof:0},
+  {w:46,h:140,roof:1},{w:64,h:95,roof:0},{w:50,h:200,roof:0},{w:36,h:120,roof:1},
+  {w:56,h:155,roof:0},{w:46,h:112,roof:1}
+];
+const skylineEl = document.getElementById('skyline');
+heroData.forEach((b,i)=>{
+  const div = document.createElement('div');
+  div.className = 'building';
+  div.style.width = b.w+'px'; div.style.height = b.h+'px';
+  const color = palette[i % palette.length];
+  div.style.background = color;
+  div.style.animationDelay = (0.35 + i*0.085)+'s';
+  const win = document.createElement('div'); win.className = 'win'; div.appendChild(win);
+  if(b.roof===1){
+    const roof = document.createElement('div'); roof.className = 'roof';
+    const half = b.w/2;
+    roof.style.borderLeftWidth = half+'px'; roof.style.borderRightWidth = half+'px';
+    roof.style.borderBottomWidth = '16px'; roof.style.borderBottomColor = color;
+    div.appendChild(roof);
+  }
+  skylineEl.appendChild(div);
+});
+
+// ---------- MINI SKYLINE (sobre section) ----------
+const miniPalette = ['#F4ECDD','#E58B63','#F4ECDD','#D98F86','#F4ECDD','#E7B155','#F4ECDD'];
+const miniHeights = [60,100,45,120,70,90,55];
+const miniEl = document.getElementById('miniSkyline');
+miniHeights.forEach((h,i)=>{
+  const d = document.createElement('div'); d.className = 'mb';
+  d.style.height = h+'px'; d.style.background = miniPalette[i % miniPalette.length];
+  miniEl.appendChild(d);
+});
+
+// ---------- CITY CARDS ----------
+const cities = [
+  {name:'João Pessoa', state:'PB', sky:'linear-gradient(180deg,#5EA3C4,#EFC57E)', mtn:'#2E4A52'},
+  {name:'Recife', state:'PE', sky:'linear-gradient(180deg,#9AD2D6,#F2A65C)', mtn:'#3E5B51'},
+  {name:'Porto Alegre', state:'RS', sky:'linear-gradient(180deg,#C6D3DE,#8B98A5)', mtn:'#4A5A63'},
+  {name:'Campinas', state:'SP', sky:'linear-gradient(180deg,#F4D9A0,#E58B63)', mtn:'#31434B'},
+  {name:'Teresópolis', state:'RJ', sky:'linear-gradient(180deg,#2E2A3A,#6B4F5E)', mtn:'#1E2A2E'}
+];
+const cityScroll = document.getElementById('cityScroll');
+cities.forEach(c=>{
+  const card = document.createElement('div'); card.className = 'city-card';
+  const blockColors = ['#C15A32','#E58B63','#F4ECDD','#5D8073','#D98F86','#E7B155'];
+  let blocksHtml = '';
+  for(let i=0;i<7;i++){
+    const h = 30 + Math.random()*70;
+    blocksHtml += `<div class="cb" style="height:${h}px; background:${blockColors[i % blockColors.length]}"></div>`;
+  }
+  card.innerHTML = `
+    <div class="city-sky" style="background:${c.sky}"></div>
+    <div class="city-mtn" style="background:${c.mtn}"></div>
+    <div class="city-blocks">${blocksHtml}</div>
+    <div class="city-label"><span class="cname">${c.name}</span><span class="cstate">${c.state}</span></div>`;
+  cityScroll.appendChild(card);
+});
+
+// ---------- MARQUEE CONTENT ----------
+const marqueeItems = ['Conhecer para Pertencer','Conhecendo Nossa Cidade','Ensino Fundamental I e II','Cada Cidade, Sua História'];
+const marqueeTrack = document.getElementById('marqueeTrack');
+function buildMarqueeGroup(){
+  const frag = document.createDocumentFragment();
+  marqueeItems.forEach((t,i)=>{
+    const s = document.createElement('span');
+    if(i%2===1) s.className='outline';
+    s.textContent = t;
+    frag.appendChild(s);
+    const dot = document.createElement('span'); dot.className='dot'; dot.textContent='•';
+    frag.appendChild(dot);
+  });
+  return frag;
+}
+marqueeTrack.appendChild(buildMarqueeGroup());
+marqueeTrack.appendChild(buildMarqueeGroup());
+
+// ---------- NAV SCROLL STATE ----------
+const nav = document.getElementById('mainNav');
+function updateNav(){ if(window.scrollY > 60){ nav.classList.add('solid'); } else { nav.classList.remove('solid'); } }
+window.addEventListener('scroll', updateNav, {passive:true});
+
+// ---------- REVEAL ON SCROLL (simple fades) ----------
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){ entry.target.classList.add('in-view'); io.unobserve(entry.target); }
+  });
+},{threshold:0.15});
+revealEls.forEach(el=>io.observe(el));
+
+/* =========================================================
+   MOTION SYSTEM — Lenis smooth scroll + GSAP ScrollTrigger
+   (inspired by the buttery, editorial motion of exoape.com)
+   ========================================================= */
+if(false){
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Lenis smooth scroll, synced to GSAP's ticker
+  const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothTouch: false });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time)=>{ lenis.raf(time*1000); });
+  gsap.ticker.lagSmoothing(0);
+
+  // Smooth-scroll internal anchor links through Lenis
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      const id = a.getAttribute('href');
+      if(id.length>1 && document.querySelector(id)){
+        e.preventDefault();
+        lenis.scrollTo(id, {offset:-20, duration:1.4});
+      }
+    });
+  });
+
+  // ---- Word-mask title reveal (translateY mask, preserves <br>) ----
+  function splitMasked(el){
+    const nodes = Array.from(el.childNodes);
+    el.innerHTML='';
+    nodes.forEach(node=>{
+      if(node.nodeType===3){
+        node.textContent.split(/(\s+)/).forEach(chunk=>{
+          if(chunk.trim()===''){ el.appendChild(document.createTextNode(chunk)); return; }
+          const mask=document.createElement('span'); mask.className='word-mask';
+          const inner=document.createElement('span'); inner.className='word-inner'; inner.textContent=chunk;
+          mask.appendChild(inner); el.appendChild(mask);
+        });
+      } else { el.appendChild(node.cloneNode(true)); }
+    });
+    return el.querySelectorAll('.word-inner');
+  }
+  document.querySelectorAll('[data-split]').forEach(el=>{
+    const words = splitMasked(el);
+    gsap.to(words, {
+      y:'0%', duration:0.9, ease:'power4.out', stagger:0.035,
+      scrollTrigger:{ trigger: el, start:'top 88%' }
+    });
+  });
+
+  // ---- Scroll-scrubbed "lighting up" statement text ----
+  document.querySelectorAll('[data-split-plain]').forEach(el=>{
+    const nodes = Array.from(el.childNodes);
+    el.innerHTML='';
+    nodes.forEach(node=>{
+      if(node.nodeType===3){
+        node.textContent.split(/(\s+)/).forEach(chunk=>{
+          if(chunk.trim()===''){ el.appendChild(document.createTextNode(chunk)); return; }
+          const s=document.createElement('span'); s.className='sw'; s.textContent=chunk;
+          el.appendChild(s);
+        });
+      } else {
+        // preserve <em> wrapping by splitting its own text too
+        const wrap = node.cloneNode(false);
+        node.textContent.split(/(\s+)/).forEach(chunk=>{
+          if(chunk.trim()===''){ wrap.appendChild(document.createTextNode(chunk)); return; }
+          const s=document.createElement('span'); s.className='sw'; s.textContent=chunk;
+          wrap.appendChild(s);
+        });
+        el.appendChild(wrap);
+      }
+    });
+    const words = el.querySelectorAll('.sw');
+    gsap.to(words, {
+      opacity:1, stagger:0.04, ease:'none',
+      scrollTrigger:{ trigger: el, start:'top 75%', end:'bottom 55%', scrub:true }
+    });
+  });
+
+  // ---- Curtain reveal for image panels ----
+  gsap.to('#sobreArt', {
+    clipPath:'inset(0% 0% 0% 0% round 26px)', duration:1.3, ease:'power4.out',
+    scrollTrigger:{ trigger:'#sobreArt', start:'top 82%' }
+  });
+  gsap.utils.toArray('.city-card').forEach((card,i)=>{
+    gsap.to(card, {
+      clipPath:'inset(0% 0% 0% 0% round 20px)', duration:1.1, ease:'power4.out', delay:i*0.06,
+      scrollTrigger:{ trigger:'#cityScroll', start:'top 85%' }
+    });
+  });
+
+  // ---- Hero parallax depth ----
+  gsap.to('#mtnFar', { y:100, ease:'none', scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:true } });
+  gsap.to('#mtnNear', { y:160, ease:'none', scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:true } });
+  gsap.to('#skyline', { y:60, ease:'none', scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:true } });
+
+  // ---- Custom cursor ----
+  if(hasFinePointer){
+    document.body.classList.add('has-custom-cursor');
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    gsap.set([dot,ring],{xPercent:-50,yPercent:-50});
+    const dotX=gsap.quickTo(dot,'x',{duration:0.05,ease:'power3'});
+    const dotY=gsap.quickTo(dot,'y',{duration:0.05,ease:'power3'});
+    const ringX=gsap.quickTo(ring,'x',{duration:0.35,ease:'power3'});
+    const ringY=gsap.quickTo(ring,'y',{duration:0.35,ease:'power3'});
+    let cursorReady = false;
+    window.addEventListener('mousemove', e=>{
+      if(!cursorReady){ dot.style.opacity = 1; ring.style.opacity = 1; cursorReady = true; }
+      dotX(e.clientX); dotY(e.clientY); ringX(e.clientX); ringY(e.clientY);
+    });
+
+    document.querySelectorAll('a, button, .city-card, .obj-card, .dif-item, .cont-card, .parc-chip, .sum-card').forEach(el=>{
+      el.addEventListener('mouseenter', ()=>ring.classList.add('hover'));
+      el.addEventListener('mouseleave', ()=>ring.classList.remove('hover'));
+    });
+
+    // ---- Magnetic buttons ----
+    document.querySelectorAll('.magnetic').forEach(btn=>{
+      btn.addEventListener('mousemove', e=>{
+        const r = btn.getBoundingClientRect();
+        const relX = e.clientX - (r.left + r.width/2);
+        const relY = e.clientY - (r.top + r.height/2);
+        gsap.to(btn, {x:relX*0.35, y:relY*0.5, duration:0.4, ease:'power3.out'});
+      });
+      btn.addEventListener('mouseleave', ()=>{ gsap.to(btn, {x:0, y:0, duration:0.5, ease:'elastic.out(1,0.4)'}); });
+    });
+  }
+
+  ScrollTrigger.refresh();
+} else {
+  document.querySelectorAll('[data-split], [data-split-plain]').forEach(el=>{});
+}
+</script>
+</body>
+</html>
